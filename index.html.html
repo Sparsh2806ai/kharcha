@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kharcha">
+<meta name="theme-color" content="#E7EEE8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1512" media="(prefers-color-scheme: dark)">
+<title>Kharcha</title>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#E7EEE8; --sheet:#FBFCFA; --ink:#1B2340; --muted:#56655D; --line:#C7D3CA;
+  --get:#1E7656; --stamp:#B8392E; --field:#FFFFFF;
+  --btn-bg:#1B2340; --btn-fg:#FFFFFF; --warn-bg:#FFF1CC; --warn-fg:#5A4300;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0F1512; --sheet:#18201B; --ink:#EDF3EE; --muted:#9FB2A7; --line:#2F3B34;
+    --get:#52C99C; --stamp:#F2857A; --field:#0F1512;
+    --btn-bg:#EDF3EE; --btn-fg:#0F1512; --warn-bg:#3A3212; --warn-fg:#F3DC98;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{background:var(--paper)}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+button{cursor:pointer;font-family:inherit;color:inherit}
+input:focus-visible,button:focus-visible{outline:3px solid #6C8CD5;outline-offset:2px}
+header{max-width:520px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 20px 4px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+h1{font-size:24px;font-weight:800;letter-spacing:-0.02em;color:var(--ink)}
+.stat{color:var(--muted);font-size:14px;font-weight:600;text-align:right}
+.stat b{color:var(--ink);font-variant-numeric:tabular-nums}
+main{max-width:520px;margin:0 auto;padding:0 16px}
+.banner{background:var(--warn-bg);color:var(--warn-fg);border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600;margin-top:12px}
+
+/* Amount */
+.amount-wrap{display:flex;align-items:baseline;gap:6px;padding:22px 4px 10px;border-bottom:2.5px solid var(--ink);margin-bottom:26px}
+.amount-wrap span{font-size:38px;font-weight:600;color:var(--muted)}
+#amount{flex:1;min-width:0;border:0;background:transparent;font-family:inherit;font-size:58px;font-weight:800;letter-spacing:-0.03em;color:var(--ink);font-variant-numeric:tabular-nums;outline:none}
+#amount::placeholder{color:var(--line)}
+
+.field{margin-bottom:22px}
+.field-title,label{display:block;font-size:14px;font-weight:700;color:var(--muted);margin-bottom:9px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);font-size:15px;font-weight:600;padding:9px 14px;border-radius:999px}
+.chip.other{border-style:dashed}
+.chip.small{font-size:14px;padding:7px 12px}
+.chip[aria-pressed="true"]{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg);border-style:solid}
+input.text,input[type=date]{display:block;width:100%;min-height:48px;font-family:inherit;font-size:16px;font-weight:600;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);-webkit-appearance:none;appearance:none}
+.chips + input.text{margin-top:10px}
+
+/* Shared */
+.share-toggle{display:flex;width:100%;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;background:var(--sheet);border:1.5px solid var(--line);border-radius:14px;text-align:left}
+.share-toggle.open{border-radius:14px 14px 0 0;border-bottom-style:dashed}
+.share-toggle strong{display:block;font-size:16px}
+.share-toggle small{display:block;color:var(--muted);font-size:13px;font-weight:500}
+.switch{position:relative;width:52px;height:32px;border-radius:999px;background:var(--line);flex-shrink:0;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.share-toggle[aria-checked="true"] .switch{background:var(--get)}
+.share-toggle[aria-checked="true"] .switch::after{transform:translateX(20px)}
+.share-body{border:1.5px solid var(--line);border-top:0;border-radius:0 0 14px 14px;padding:16px;background:var(--sheet)}
+.share-body input.text{margin-bottom:16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:3px;margin-bottom:16px}
+.seg button{border:0;background:transparent;font-weight:700;font-size:15px;padding:10px;border-radius:9px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg)}
+.stepper{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--line);border-radius:12px;background:var(--field);margin-bottom:16px}
+.stepper button{width:52px;height:48px;border:0;background:transparent;font-size:24px;font-weight:700}
+.stepper span{font-weight:700}
+.split-result{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.split-result div{background:var(--paper);border-radius:12px;padding:10px 12px}
+.split-result span{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.split-result b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.get{color:var(--get)}
+
+.primary{display:block;width:100%;border:0;background:var(--btn-bg);color:var(--btn-fg);font-size:17px;font-weight:800;padding:17px;border-radius:14px;margin-top:6px}
+.primary.small{font-size:15px;padding:13px;margin-top:12px}
+.ghost{display:block;width:100%;border:0;background:transparent;color:var(--muted);font-weight:700;padding:14px;margin-top:4px}
+
+/* Shared blocks for dashboard, history, collect */
+.view-top{margin-top:18px}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin:18px 0 14px}
+.month-nav h2{font-size:20px;font-weight:800}
+.month-nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--sheet);font-size:22px;font-weight:700}
+.ledger,.card{background:var(--sheet);border:1.5px solid var(--line);border-radius:14px;padding:2px 16px;margin-bottom:22px}
+.card{padding:8px 16px}
+.ledger .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.ledger .row:last-child{border-bottom:0}
+.ledger .row span{color:var(--muted);font-weight:600}
+.ledger .row b{font-weight:800;font-size:17px}
+.ledger .row.big b{font-size:24px;letter-spacing:-0.02em}
+.section-title{font-size:16px;font-weight:800;margin:0 4px 8px}
+.range{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.range label{margin:0}
+.range input{margin-top:6px}
+.range-label{font-size:13px;color:var(--muted);font-weight:600;margin:10px 4px 14px}
+.bar-row{padding:8px 0}
+.bar-top{display:flex;justify-content:space-between;gap:10px;font-size:15px;font-weight:700;margin-bottom:6px;font-variant-numeric:tabular-nums}
+.bar-top em{font-style:normal;color:var(--muted);font-weight:600;font-size:13px;margin-left:6px}
+.bar{height:8px;background:var(--paper);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:99px}
+.day{font-size:14px;font-weight:700;color:var(--muted);margin:18px 4px 8px}
+.entry{background:var(--sheet);border:1.5px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.entry-main{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:0;background:transparent;text-align:left}
+.left{min-width:0}
+.left strong{display:block;font-size:16px}
+.left small{display:block;color:var(--muted);font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amt{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.owe{padding:0 16px 12px;margin-top:-6px;font-size:14px;font-weight:700;color:var(--get)}
+.owe.done{color:var(--muted);font-weight:600}
+.actions{display:none;gap:8px;padding:0 16px 14px}
+.entry.open .actions{display:flex}
+.actions button,.mini,.outline{border:1.5px solid var(--line);background:var(--field);border-radius:10px;font-weight:700}
+.actions button{flex:1;padding:10px 6px;font-size:14px}
+.actions .danger{color:var(--stamp)}
+.actions .danger.armed{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.person-body{display:none;padding:0 16px 14px}
+.person.open .person-body{display:block}
+.mrow{display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:var(--muted);padding:12px 0 4px;border-top:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0}
+.item-r{display:flex;align-items:center;gap:8px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.mini{padding:7px 10px;font-size:13px}
+.outline{display:block;width:100%;padding:13px;font-size:15px;margin-top:8px}
+.note{font-size:14px;color:var(--muted);font-weight:500;padding:6px 0}
+.empty{text-align:center;padding:30px 16px;color:var(--muted);font-weight:600}
+.empty button{margin-top:14px;border:0;background:var(--btn-bg);color:var(--btn-fg);font-weight:700;padding:12px 20px;border-radius:12px}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--sheet);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.tabbar button{border:0;background:transparent;font-weight:700;font-size:13px;padding:12px 2px;border-radius:12px;color:var(--muted)}
+.tabbar button[aria-current="page"]{background:var(--btn-bg);color:var(--btn-fg)}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--btn-bg);color:var(--btn-fg);font-weight:700;font-size:15px;padding:11px 18px;border-radius:999px;transition:opacity .2s,transform .2s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Kharcha</h1>
+  <p class="stat" id="headerStat"></p>
+</header>
+
+<main>
+<p class="banner" id="previewBanner" hidden>Preview only. Entries made here are not kept. Open your own copy of the app to save on your phone.</p>
+
+<!-- ADD -->
+<section id="addView">
+  <label class="amount-wrap" for="amount">
+    <span aria-hidden="true">₹</span>
+    <input id="amount" inputmode="decimal" placeholder="0" autocomplete="off" aria-label="Amount in rupees">
+  </label>
+
+  <div class="field">
+    <p class="field-title" id="typeLbl">Expense type</p>
+    <div class="chips" id="typeChips" role="group" aria-labelledby="typeLbl"></div>
+    <input class="text" id="typeCustom" placeholder="Type expense nature, e.g. Gym fees" maxlength="40" hidden>
+  </div>
+
+  <div class="field">
+    <p class="field-title" id="modeLbl">Paid with</p>
+    <div class="chips" id="modeChips" role="group" aria-labelledby="modeLbl"></div>
+    <input class="text" id="modeCustom" placeholder="Type payment mode, e.g. Amazon Pay wallet" maxlength="40" hidden>
+  </div>
+
+  <div class="field">
+    <label for="date">Date</label>
+    <input type="date" id="date">
+  </div>
+
+  <div class="field">
+    <label for="note">Note (optional)</label>
+    <input class="text" id="note" placeholder="e.g. Dinner with team" maxlength="80">
+  </div>
+
+  <div class="field">
+    <button type="button" class="share-toggle" id="shareToggle" role="switch" aria-checked="false">
+      <span><strong>Shared expense</strong><small>Split it and track what you get back</small></span>
+      <span class="switch" aria-hidden="true"></span>
+    </button>
+    <div class="share-body" id="shareBody" hidden>
+      <label for="person">Shared with</label>
+      <input class="text" id="person" placeholder="Name, e.g. Rahul" maxlength="40" list="peopleList" autocomplete="off">
+      <datalist id="peopleList"></datalist>
+      <div class="seg" id="splitSeg" role="group" aria-label="How to split">
+        <button type="button" data-split="equal">Split equally</button>
+        <button type="button" data-split="custom">Custom amount</button>
+      </div>
+      <div id="equalBox">
+        <label>People in total, including you</label>
+        <div class="stepper">
+          <button type="button" data-step="-1" aria-label="Fewer people">−</button>
+          <span id="peopleOut">2 people</span>
+          <button type="button" data-step="1" aria-label="More people">+</button>
+        </div>
+      </div>
+      <div id="customBox" hidden>
+        <label for="customOwes">Amount you'll get back</label>
+        <input class="text" id="customOwes" inputmode="decimal" placeholder="0">
+      </div>
+      <div class="split-result">
+        <div><span>Your share</span><b id="mineOut">₹0</b></div>
+        <div><span>You get back</span><b class="get" id="getOut">₹0</b></div>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="primary" id="saveBtn">Save expense</button>
+  <button type="button" class="ghost" id="cancelEdit" hidden>Cancel edit</button>
+</section>
+
+<!-- DASHBOARD -->
+<section id="dashView" class="view-top" hidden></section>
+
+<!-- HISTORY -->
+<section id="historyView" hidden>
+  <div class="month-nav">
+    <button type="button" id="prevM" aria-label="Previous month">‹</button>
+    <h2 id="monthLabel"></h2>
+    <button type="button" id="nextM" aria-label="Next month">›</button>
+  </div>
+  <div class="ledger" id="ledger"></div>
+  <div id="entries"></div>
+</section>
+
+<!-- TO COLLECT -->
+<section id="collectView" class="view-top" hidden></section>
+
+<input type="file" id="restoreFile" accept=".json,application/json" hidden>
+</main>
+
+<nav class="tabbar">
+  <button type="button" data-tab="add" aria-current="page">Add</button>
+  <button type="button" data-tab="dash">Dashboard</button>
+  <button type="button" data-tab="history">History</button>
+  <button type="button" data-tab="collect">To collect</button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const BASE_TYPES=['Food','Groceries','Transport','Fuel','Shopping','Bills','Rent','Health','Entertainment','Travel','Education'];
+const BASE_MODES=['UPI','Cash','Credit card','Debit card','Net banking'];
+const KEY='kharcha-expenses-v1';
+const CUSTOM='__custom__';
+const PERIODS=[['this','This month'],['last','Last month'],['3m','Last 3 months'],['fy','This FY'],['all','All time'],['custom','Custom']];
+
+const $=id=>document.getElementById(id);
+const inr=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2});
+const fmt=n=>inr.format(n||0);
+const pad=n=>String(n).padStart(2,'0');
+const ds=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const todayStr=()=>ds(new Date());
+const round2=n=>Math.round(n*100)/100;
+const num=id=>{const v=parseFloat(String($(id).value).replace(/,/g,''));return isNaN(v)?0:v};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uniq=a=>[...new Set(a)];
+const dShort=d=>new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const dLong=d=>new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+const monthName=ym=>new Date(ym+'-01T00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+
+let expenses=[];
+let state;
+let viewMonth=todayStr().slice(0,7);
+let openId=null, deleteArm=null, openPerson=null, collectMode='pending', lastGroups=[];
+const periods={dash:{key:'this'},collect:{key:'all'}};
+
+/* ---------- on-phone storage ---------- */
+const store={
+  ok:false,
+  init(){
+    try{const t='__kharcha_test';window.localStorage.setItem(t,'1');window.localStorage.removeItem(t);this.ok=true;}
+    catch(e){this.ok=false;}
+    if(this.ok&&navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(()=>{});}
+  },
+  load(){
+    if(!this.ok)return[];
+    try{const v=JSON.parse(window.localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[];}
+    catch(e){return[];}
+  },
+  save(d){
+    if(!this.ok)return;
+    try{window.localStorage.setItem(KEY,JSON.stringify(d));}
+    catch(e){toast('Could not save. Phone storage may be full.');}
+  }
+};
+const persist=()=>store.save(expenses);
+
+/* ---------- form ---------- */
+const typeOptions=()=>uniq([...BASE_TYPES,...expenses.map(e=>e.type).filter(Boolean)]);
+const modeOptions=()=>uniq([...BASE_MODES,...expenses.map(e=>e.mode).filter(Boolean)]);
+const matchCase=(v,opts)=>opts.find(o=>o.toLowerCase()===v.toLowerCase())||v;
+
+function buildChips(which){
+  const isType=which==='type';
+  const items=isType?typeOptions():modeOptions();
+  const cur=state[which];
+  $(isType?'typeChips':'modeChips').innerHTML=
+    items.map(v=>`<button type="button" class="chip" data-v="${esc(v)}" aria-pressed="${cur===v}">${esc(v)}</button>`).join('')+
+    `<button type="button" class="chip other" data-v="${CUSTOM}" aria-pressed="${cur===CUSTOM}">Type your own</button>`;
+  $(isType?'typeCustom':'modeCustom').hidden=cur!==CUSTOM;
+}
+function chipClick(which){
+  return ev=>{
+    const b=ev.target.closest('.chip');if(!b)return;
+    state[which]=b.dataset.v;buildChips(which);
+    if(state[which]===CUSTOM)$(which==='type'?'typeCustom':'modeCustom').focus();
+  };
+}
+$('typeChips').onclick=chipClick('type');
+$('modeChips').onclick=chipClick('mode');
+
+function refreshPeople(){
+  const names=uniq(expenses.filter(e=>e.shared&&e.person).map(e=>e.person.trim()));
+  $('peopleList').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+}
+
+function calcOwes(){
+  const amt=num('amount');
+  if(state.split==='equal')return round2(amt*(state.people-1)/state.people);
+  return num('customOwes');
+}
+function updateSplit(){
+  const amt=num('amount'),owes=calcOwes();
+  $('mineOut').textContent=fmt(Math.max(round2(amt-owes),0));
+  $('getOut').textContent=fmt(owes);
+}
+function syncShare(){
+  $('shareToggle').setAttribute('aria-checked',state.shared);
+  $('shareToggle').classList.toggle('open',state.shared);
+  $('shareBody').hidden=!state.shared;
+  updateSplit();
+}
+function syncSplit(){
+  document.querySelectorAll('#splitSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.split===state.split));
+  $('equalBox').hidden=state.split!=='equal';
+  $('customBox').hidden=state.split!=='custom';
+  $('peopleOut').textContent=state.people+' people';
+  updateSplit();
+}
+$('shareToggle').onclick=()=>{state.shared=!state.shared;syncShare();};
+document.querySelectorAll('#splitSeg button').forEach(b=>b.onclick=()=>{state.split=b.dataset.split;syncSplit();});
+document.querySelectorAll('.stepper button').forEach(b=>b.onclick=()=>{
+  state.people=Math.min(20,Math.max(2,state.people+Number(b.dataset.step)));syncSplit();
+});
+$('amount').oninput=updateSplit;
+$('customOwes').oninput=updateSplit;
+
+function resetForm(){
+  state={type:null,mode:'UPI',shared:false,split:'equal',people:2,editingId:null};
+  ['amount','note','person','customOwes','typeCustom','modeCustom'].forEach(id=>$(id).value='');
+  $('date').value=todayStr();
+  buildChips('type');buildChips('mode');
+  syncShare();syncSplit();
+  $('saveBtn').textContent='Save expense';
+  $('cancelEdit').hidden=true;
+}
+
+function save(){
+  const amt=round2(num('amount'));
+  if(amt<=0){toast('Enter an amount');$('amount').focus();return;}
+  let type=state.type===CUSTOM?$('typeCustom').value.trim():state.type;
+  if(!type){toast(state.type===CUSTOM?'Type the expense nature':'Pick an expense type');return;}
+  let mode=state.mode===CUSTOM?$('modeCustom').value.trim():state.mode;
+  if(!mode){toast('Type the payment mode');return;}
+  type=matchCase(type,typeOptions());
+  mode=matchCase(mode,modeOptions());
+  let owes=0,person='';
+  if(state.shared){
+    owes=round2(calcOwes());
+    person=$('person').value.trim()||'Friend';
+    person=matchCase(person,expenses.filter(e=>e.person).map(e=>e.person));
+    if(owes<0||owes>amt){toast('Amount to get back is more than the total');return;}
+  }
+  const old=state.editingId?expenses.find(x=>x.id===state.editingId):null;
+  const entry={
+    id:old?old.id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    amount:amt,type,mode,
+    date:$('date').value||todayStr(),note:$('note').value.trim(),
+    shared:state.shared,person,owes,split:state.split,people:state.people,
+    settled:old&&state.shared?!!old.settled:false
+  };
+  if(old)expenses=expenses.map(x=>x.id===old.id?entry:x);
+  else expenses.push(entry);
+  persist();
+  resetForm();
+  renderAll();
+  toast(old?'Expense updated':'Expense saved');
+  if(old){viewMonth=entry.date.slice(0,7);openId=null;renderHistory();setTab('history');}
+}
+$('saveBtn').onclick=save;
+$('cancelEdit').onclick=()=>{resetForm();setTab('history');};
+
+function startEdit(id){
+  const e=expenses.find(x=>x.id===id);if(!e)return;
+  state={type:e.type,mode:e.mode,shared:!!e.shared,split:e.split||'custom',people:e.people||2,editingId:id};
+  $('amount').value=e.amount;$('date').value=e.date;$('note').value=e.note||'';
+  $('person').value=e.shared?e.person:'';
+  $('customOwes').value=e.shared&&state.split==='custom'?e.owes:'';
+  buildChips('type');buildChips('mode');
+  syncShare();syncSplit();
+  $('saveBtn').textContent='Update expense';$('cancelEdit').hidden=false;
+  setTab('add');
+}
+
+/* ---------- periods ---------- */
+function periodRange(p){
+  const t=new Date(),y=t.getFullYear(),m=t.getMonth();
+  switch(p.key){
+    case 'this':return[ds(new Date(y,m,1)),ds(new Date(y,m+1,0))];
+    case 'last':return[ds(new Date(y,m-1,1)),ds(new Date(y,m,0))];
+    case '3m':return[ds(new Date(y,m-2,1)),ds(new Date(y,m+1,0))];
+    case 'fy':return m>=3?[`${y}-04-01`,`${y+1}-03-31`]:[`${y-1}-04-01`,`${y}-03-31`];
+    case 'custom':return[p.from||null,p.to||null];
+    default:return[null,null];
+  }
+}
+const inRange=(d,[f,t])=>(!f||d>=f)&&(!t||d<=t);
+function rangeLabel(p){
+  const [f,t]=periodRange(p);
+  if(!f&&!t)return'All your expenses';
+  if(f&&t)return`${dLong(f)} to ${dLong(t)}`;
+  return f?`From ${dLong(f)}`:`Up to ${dLong(t)}`;
+}
+function periodHTML(name,p){
+  return `<div class="chips period" data-period="${name}">${PERIODS.map(([k,l])=>
+    `<button type="button" class="chip small" data-k="${k}" aria-pressed="${p.key===k}">${l}</button>`).join('')}</div>`+
+    (p.key==='custom'?`<div class="range">
+      <label>From<input type="date" data-from="${name}" value="${p.from||''}"></label>
+      <label>To<input type="date" data-to="${name}" value="${p.to||''}"></label></div>`:'')+
+    `<p class="range-label">${rangeLabel(p)}</p>`;
+}
+function periodClick(ev){
+  const c=ev.target.closest('.period .chip');if(!c)return false;
+  const name=c.closest('.period').dataset.period,p=periods[name];
+  p.key=c.dataset.k;
+  if(p.key==='custom'){const t=todayStr();p.from=p.from||t.slice(0,8)+'01';p.to=p.to||t;}
+  openPerson=null;
+  name==='dash'?renderDash():renderCollect();
+  return true;
+}
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset&&t.dataset.from){periods[t.dataset.from].from=t.value;t.dataset.from==='dash'?renderDash():renderCollect();}
+  else if(t.dataset&&t.dataset.to){periods[t.dataset.to].to=t.value;t.dataset.to==='dash'?renderDash():renderCollect();}
+});
+
+/* ---------- dashboard ---------- */
+function bars(rows,total){
+  const max=Math.max(...rows.map(r=>r[1]),1);
+  return rows.map(([k,v])=>`<div class="bar-row"><div class="bar-top"><span>${esc(k)}${total?`<em>${Math.round(v/total*100)}%</em>`:''}</span><b>${fmt(v)}</b></div><div class="bar"><i style="width:${Math.max(v/max*100,2)}%"></i></div></div>`).join('');
+}
+function renderDash(){
+  const p=periods.dash,r=periodRange(p);
+  const list=expenses.filter(e=>inRange(e.date,r));
+  const mine=round2(list.reduce((s,e)=>s+e.amount-e.owes,0));
+  const paid=round2(list.reduce((s,e)=>s+e.amount,0));
+  const pend=round2(list.reduce((s,e)=>s+(e.shared&&!e.settled?e.owes:0),0));
+  const recd=round2(list.reduce((s,e)=>s+(e.shared&&e.settled?e.owes:0),0));
+  let avg='';
+  if(list.length){
+    const from=r[0]||list.map(e=>e.date).sort()[0],today=todayStr();
+    const to=r[1]&&r[1]<today?r[1]:today;
+    const days=Math.round((new Date(to+'T00:00')-new Date(from+'T00:00'))/864e5)+1;
+    if(days>0)avg=`<div class="row"><span>Average per day</span><b>${fmt(round2(mine/days))}</b></div>`;
+  }
+  const sumBy=(key,val)=>{
+    const m=new Map();
+    list.forEach(e=>{const k=key(e);m.set(k,(m.get(k)||0)+val(e));});
+    return[...m.entries()].map(([k,v])=>[k,round2(v)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+  };
+  const byType=sumBy(e=>e.type,e=>e.amount-e.owes);
+  const byMode=sumBy(e=>e.mode,e=>e.amount);
+  const byMonth=sumBy(e=>e.date.slice(0,7),e=>e.amount-e.owes).sort((a,b)=>a[0].localeCompare(b[0]));
+
+  let h=periodHTML('dash',p);
+  h+=`<div class="ledger">
+    <div class="row big"><span>Your spend</span><b>${fmt(mine)}</b></div>
+    <div class="row"><span>Total paid</span><b>${fmt(paid)}</b></div>
+    <div class="row"><span>Still to get back</span><b class="get">${fmt(pend)}</b></div>
+    <div class="row"><span>Received back</span><b>${fmt(recd)}</b></div>
+    <div class="row"><span>Number of expenses</span><b>${list.length}</b></div>
+    ${avg}</div>`;
+  if(!list.length){
+    h+=`<div class="empty">No expenses in this period.<br><button type="button" data-act="goadd">Add expense</button></div>`;
+  }else{
+    if(byType.length)h+=`<p class="section-title">Your spend by type</p><div class="card">${bars(byType,mine)}</div>`;
+    if(byMode.length)h+=`<p class="section-title">Paid by mode</p><div class="card">${bars(byMode,paid)}</div>`;
+    if(byMonth.length>1)h+=`<p class="section-title">Month by month (your spend)</p><div class="card">${bars(byMonth.map(([k,v])=>[monthName(k),v]),null)}</div>`;
+  }
+  h+=`<p class="section-title">Your data</p><div class="card">
+    <p class="note">${store.ok?'Saved only on this phone, never on any server. Back up to Files now and then, so you don\u2019t lose it if the app is removed.':'Preview mode: nothing is saved here.'}</p>
+    <button type="button" class="outline" data-act="backup">Back up to Files</button>
+    <button type="button" class="outline" data-act="restore">Restore from backup</button>
+    <button type="button" class="outline" data-act="csv">Export all for Excel (CSV)</button>
+    <div style="height:8px"></div></div>`;
+  $('dashView').innerHTML=h;
+}
+
+function download(name,text,type){
+  const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+$('dashView').onclick=ev=>{
+  if(periodClick(ev))return;
+  const b=ev.target.closest('button[data-act]');if(!b)return;
+  const a=b.dataset.act;
+  if(a==='goadd')setTab('add');
+  else if(a==='backup'){
+    download(`kharcha-backup-${todayStr()}.json`,JSON.stringify({app:'kharcha',version:1,exported:new Date().toISOString(),expenses},null,2),'application/json');
+  }else if(a==='restore'){$('restoreFile').click();}
+  else if(a==='csv'){
+    const rows=[['Date','Expense type','Payment mode','Note','Total amount','Your share','Shared with','To get back','Status']];
+    expenses.slice().sort((x,y)=>x.date.localeCompare(y.date)).forEach(e=>rows.push([
+      e.date,e.type,e.mode,e.note||'',e.amount,round2(e.amount-e.owes),
+      e.shared?e.person:'',e.shared?e.owes:'',e.shared?(e.settled?'Received':'Pending'):''
+    ]));
+    const csv=rows.map(r=>r.map(c=>{const s=String(c);return/[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}).join(',')).join('\n');
+    download(`kharcha-${todayStr()}.csv`,'\ufeff'+csv,'text/csv');
+  }
+};
+$('restoreFile').onchange=async ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  try{
+    const data=JSON.parse(await f.text());
+    const arr=Array.isArray(data)?data:data.expenses;
+    if(!Array.isArray(arr))throw new Error('bad');
+    const valid=arr.filter(e=>e&&e.id&&typeof e.amount==='number'&&e.date&&e.type);
+    const m=new Map(expenses.map(e=>[e.id,e]));
+    valid.forEach(e=>m.set(e.id,e));
+    expenses=[...m.values()];
+    persist();renderAll();
+    toast(`Restored ${valid.length} expenses`);
+  }catch(e){toast('That file is not a Kharcha backup');}
+  ev.target.value='';
+};
+
+/* ---------- history ---------- */
+function shiftMonth(d){
+  const [y,m]=viewMonth.split('-').map(Number);
+  const dt=new Date(y,m-1+d,1);
+  viewMonth=`${dt.getFullYear()}-${pad(dt.getMonth()+1)}`;
+  openId=null;deleteArm=null;renderHistory();
+}
+$('prevM').onclick=()=>shiftMonth(-1);
+$('nextM').onclick=()=>shiftMonth(1);
+
+function renderHistory(){
+  $('monthLabel').textContent=monthName(viewMonth);
+  const list=expenses.filter(e=>e.date.startsWith(viewMonth))
+    .sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  const paid=list.reduce((s,e)=>s+e.amount,0);
+  const mine=list.reduce((s,e)=>s+e.amount-e.owes,0);
+  $('ledger').innerHTML=`
+    <div class="row big"><span>Your spend</span><b>${fmt(mine)}</b></div>
+    <div class="row"><span>Total paid</span><b>${fmt(paid)}</b></div>`;
+  if(!list.length){
+    $('entries').innerHTML=`<div class="empty">No expenses in ${monthName(viewMonth)}.<br><button type="button" data-act="goadd">Add expense</button></div>`;
+    return;
+  }
+  let html='',lastDay='';
+  list.forEach(e=>{
+    if(e.date!==lastDay){
+      lastDay=e.date;
+      html+=`<p class="day">${new Date(e.date+'T00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</p>`;
+    }
+    const sub=[e.mode,e.note].filter(Boolean).map(esc).join(', ');
+    const owe=e.shared&&e.owes>0
+      ?`<div class="owe ${e.settled?'done':''}">${e.settled?`${esc(e.person)} paid back ${fmt(e.owes)}`:`${esc(e.person)} owes you ${fmt(e.owes)}`}</div>`:'';
+    html+=`<div class="entry ${openId===e.id?'open':''}" data-id="${e.id}">
+      <button type="button" class="entry-main" data-act="toggle" aria-expanded="${openId===e.id}">
+        <span class="left"><strong>${esc(e.type)}</strong><small>${sub}</small></span>
+        <span class="amt">${fmt(e.amount)}</span>
+      </button>
+      ${owe}
+      <div class="actions">
+        ${e.shared&&e.owes>0?`<button type="button" data-act="settle">${e.settled?'Mark pending':'Mark received'}</button>`:''}
+        <button type="button" data-act="edit">Edit</button>
+        <button type="button" class="danger ${deleteArm===e.id?'armed':''}" data-act="delete">${deleteArm===e.id?'Tap to confirm':'Delete'}</button>
+      </div>
+    </div>`;
+  });
+  $('entries').innerHTML=html;
+}
+$('entries').onclick=ev=>{
+  const b=ev.target.closest('button');if(!b)return;
+  const act=b.dataset.act;
+  if(act==='goadd'){setTab('add');return;}
+  const card=b.closest('.entry');if(!card)return;
+  const id=card.dataset.id,e=expenses.find(x=>x.id===id);
+  if(act==='toggle'){openId=openId===id?null:id;deleteArm=null;renderHistory();}
+  else if(act==='settle'){e.settled=!e.settled;persist();renderAll();toast(e.settled?'Marked as received':'Marked as pending');}
+  else if(act==='edit'){startEdit(id);}
+  else if(act==='delete'){
+    if(deleteArm===id){expenses=expenses.filter(x=>x.id!==id);deleteArm=null;openId=null;persist();renderAll();toast('Expense deleted');}
+    else{deleteArm=id;renderHistory();}
+  }
+};
+
+/* ---------- to collect ---------- */
+function groupByPerson(items){
+  const m=new Map();
+  items.forEach(e=>{
+    const k=e.person.trim().toLowerCase();
+    if(!m.has(k))m.set(k,{name:e.person.trim(),total:0,items:[]});
+    const g=m.get(k);g.total+=e.owes;g.items.push(e);
+  });
+  return[...m.values()].map(g=>{g.total=round2(g.total);g.items.sort((a,b)=>b.date.localeCompare(a.date));return g;})
+    .sort((a,b)=>b.total-a.total);
+}
+function renderCollect(){
+  const p=periods.collect,r=periodRange(p),received=collectMode==='received';
+  const items=expenses.filter(e=>e.shared&&e.owes>0&&!!e.settled===received&&inRange(e.date,r));
+  const groups=groupByPerson(items);lastGroups=groups;
+  const total=round2(items.reduce((s,e)=>s+e.owes,0));
+  let h=`<div class="seg" role="group" aria-label="Show">
+    <button type="button" data-act="cmode" data-m="pending" aria-pressed="${!received}">To collect</button>
+    <button type="button" data-act="cmode" data-m="received" aria-pressed="${received}">Received</button></div>`;
+  h+=periodHTML('collect',p);
+  h+=`<div class="ledger">
+    <div class="row big"><span>${received?'Received back':'Total to collect'}</span><b class="get">${fmt(total)}</b></div>
+    <div class="row"><span>People</span><b>${groups.length}</b></div>
+    <div class="row"><span>Shared expenses</span><b>${items.length}</b></div></div>`;
+  if(!groups.length){
+    h+=`<div class="empty">${received?'Nothing received back in this period.':'Nobody owes you money in this period.'}</div>`;
+  }
+  groups.forEach((g,i)=>{
+    const open=openPerson===g.name.toLowerCase();
+    const dates=g.items.map(e=>e.date).sort();
+    const span=dates[0]===dates[dates.length-1]?dLong(dates[0]):`${dLong(dates[0])} to ${dLong(dates[dates.length-1])}`;
+    const months=new Map();
+    g.items.forEach(e=>{const ym=e.date.slice(0,7);if(!months.has(ym))months.set(ym,[]);months.get(ym).push(e);});
+    let body='';
+    months.forEach((list,ym)=>{
+      body+=`<div class="mrow"><span>${monthName(ym)}</span><b>${fmt(round2(list.reduce((s,e)=>s+e.owes,0)))}</b></div>`;
+      list.forEach(e=>{
+        const sub=[dShort(e.date),e.note,`bill ${fmt(e.amount)}`].filter(Boolean).map(esc).join(', ');
+        body+=`<div class="item"><div class="left"><strong>${esc(e.type)}</strong><small>${sub}</small></div>
+          <div class="item-r"><b>${fmt(e.owes)}</b><button type="button" class="mini" data-act="one" data-id="${e.id}">${received?'Undo':'Received'}</button></div></div>`;
+      });
+    });
+    body+=`<button type="button" class="primary small" data-act="allp" data-i="${i}">${received?'Move all back to pending':`Mark all received (${fmt(g.total)})`}</button>`;
+    h+=`<div class="entry person ${open?'open':''}">
+      <button type="button" class="entry-main" data-act="person" data-i="${i}" aria-expanded="${open}">
+        <span class="left"><strong>${esc(g.name)}</strong><small>${g.items.length} expense${g.items.length>1?'s':''}, ${span}</small></span>
+        <span class="amt ${received?'':'get'}">${fmt(g.total)}</span>
+      </button>
+      <div class="person-body">${body}</div></div>`;
+  });
+  $('collectView').innerHTML=h;
+}
+$('collectView').onclick=ev=>{
+  if(periodClick(ev))return;
+  const b=ev.target.closest('button[data-act]');if(!b)return;
+  const a=b.dataset.act;
+  if(a==='cmode'){collectMode=b.dataset.m;openPerson=null;renderCollect();}
+  else if(a==='person'){const k=lastGroups[b.dataset.i].name.toLowerCase();openPerson=openPerson===k?null:k;renderCollect();}
+  else if(a==='one'){
+    const e=expenses.find(x=>x.id===b.dataset.id);if(!e)return;
+    e.settled=!e.settled;persist();renderAll();
+    toast(e.settled?'Marked as received':'Moved back to pending');
+  }else if(a==='allp'){
+    const g=lastGroups[b.dataset.i],to=collectMode!=='received';
+    g.items.forEach(e=>e.settled=to);persist();renderAll();
+    toast(to?`All of ${g.name}\u2019s dues marked received`:'Moved back to pending');
+  }
+};
+
+/* ---------- shell ---------- */
+function renderHeader(){
+  const m=todayStr().slice(0,7);
+  const mine=expenses.filter(e=>e.date.startsWith(m)).reduce((s,e)=>s+e.amount-e.owes,0);
+  $('headerStat').innerHTML=`Your spend this month<br><b>${fmt(mine)}</b>`;
+}
+function renderAll(){
+  renderHeader();renderHistory();renderDash();renderCollect();
+  buildChips('type');buildChips('mode');refreshPeople();
+}
+function setTab(t){
+  ['add','dash','history','collect'].forEach(v=>$(v==='add'?'addView':v==='dash'?'dashView':v+'View').hidden=v!==t);
+  document.querySelectorAll('.tabbar button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tabbar button').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+
+let tt;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2000);}
+
+store.init();
+expenses=store.load();
+if(!store.ok)$('previewBanner').hidden=false;
+resetForm();
+renderAll();
+</script>
+</body>
+</html>
